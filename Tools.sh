@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source "/data/Applications/GitScript/JenkinsDev/SetPath.sh"
+source "/data/Applications/GitScript/Jenkins/SetPath.sh"
 SetStaticPath
 GetProjectsNamefromRunName
 
@@ -8,9 +8,6 @@ RemoveNumericPrefixFromSubDir(){
 
      for proj in "${projects_list[@]}"
 	do
-          PROJECT_NAME=$proj
-     
-	  SetFinalPath $PROJECT_NAME
 
           #pour slbio00d
 	  for mydir in $(ls -d "${SLBIO_PROJECT_PATH}"*"/")

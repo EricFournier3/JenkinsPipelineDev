@@ -6,20 +6,23 @@ Eric Fournier 2019-07-09
 HEADER
 
 
-source "/data/Applications/GitScript/JenkinsDev/SetPath.sh"
-source "/data/Applications/GitScript/JenkinsDev/Tools.sh"
+source "/data/Applications/GitScript/Jenkins/SetPath.sh"
+source "/data/Applications/GitScript/Jenkins/Tools.sh"
 SetStaticPath
 GetProjectsNamefromRunName
 
 
 BuildSlbioStruct(){
-	echo $SLBIO_RUN_PATH	
 	if [ -d $SLBIO_RUN_PATH ]
 		then :
-                RemoveNumericPrefixFromSubDir
         else
 		mkdir $SLBIO_RUN_PATH
 	fi
+
+	if [ -d ${SLBIO_PROJECT_PATH} ]
+	  then
+             RemoveNumericPrefixFromSubDir
+        fi
 
         if [ -d $SLBIO_FASTQ_BRUT_PATH ]
           then
@@ -112,7 +115,6 @@ CreateSymLinkForCoreSNV(){
 
 
 CreateSampleSheetForNewPipeline(){
-
     sudo cp "${LSPQ_MISEQ_RUN_PATH}${LSPQ_MISEQ_EXPERIMENTAL}${PARAM_SAMPLESHEET_NAME}" $SLBIO_PROJECT_PATH
 
     awk '{sub("\r$", "");print}' "${SLBIO_PROJECT_PATH}${PARAM_SAMPLESHEET_NAME}" >  "${SLBIO_PROJECT_PATH}${PARAM_SAMPLESHEET_NAME}.temp"

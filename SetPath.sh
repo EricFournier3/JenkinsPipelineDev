@@ -5,19 +5,19 @@ Eric Fournier 2019-07-09
 
 HEADER
 CURRENT_YEAR=$(echo $(date +'%Y'))
-PARAM_FILE="/data/Applications/GitScript/JenkinsDev/JenkinsParameter.yaml"
-GET_PARAM_SCRIPT="/data/Applications/GitScript/JenkinsDev/GetJenkinsParamVal.py"
+PARAM_FILE="/data/Applications/GitScript/Jenkins/JenkinsParameter.yaml"
+GET_PARAM_SCRIPT="/data/Applications/GitScript/Jenkins/GetJenkinsParamVal.py"
 RUN_QUAL_SCRIPT="/data/Applications/GitScript/MiSeqRunQuality/MiSeqStat7.py"
-GET_SPECIMENS_SCRIPT="/data/Applications/GitScript/JenkinsDev/GetSpecimensForTask.py"
+GET_SPECIMENS_SCRIPT="/data/Applications/GitScript/Jenkins/GetSpecimensForTask.py"
 COMPUTE_SAMPLE_COVERAGE_SCRIPT="/data/Applications/GitScript/MiSeqRunQuality/ComputeExpectedGenomesCoverage.py"
-CORESNV_REFERENCE_SCRIPT="/data/Applications/GitScript/JenkinsDev/CheckCoreSnvReference.py"
-QUAST_REFERENCE_SCRIPT="/data/Applications/GitScript/JenkinsDev/CheckQuastReference.py"
+CORESNV_REFERENCE_SCRIPT="/data/Applications/GitScript/Jenkins/CheckCoreSnvReference.py"
+QUAST_REFERENCE_SCRIPT="/data/Applications/GitScript/Jenkins/CheckQuastReference.py"
 CORESNV_EXEC="/data/Applications/SnvPhyl_Client/snvphyl-galaxy-cli/bin/snvphyl.py"
-POSITION2PHYLOVIZ_SCRIPT="/data/Applications/GitScript/JenkinsDev/positions2phyloviz.pl"
+POSITION2PHYLOVIZ_SCRIPT="/data/Applications/GitScript/Jenkins/positions2phyloviz.pl"
 FUNANNOTATE_SCRIPT="/home/foueri01@inspq.qc.ca/InternetProgram/Funannotate/funannotate/funannotate.py"
 GRAPETREE_SCRIPT="/data/Applications/GrapeTree/grapetree.py"
 #PASS_FILE="/home/foueri01@inspq.qc.ca/pass.txt"
-PARSE_SPEC_TAXON_SCRIPT="/data/Applications/GitScript/JenkinsDev/ParseQiime.awk"
+PARSE_SPEC_TAXON_SCRIPT="/data/Applications/GitScript/Jenkins/ParseQiime.awk"
 SILVA_CLASSIFIER="/data/Applications/Miniconda/miniconda3/envs/qiime2-2019.10/Classifier/silva-132-99-nb-classifier.qza"
 GREENGENE_CLASSIFIER="/data/Applications/Miniconda/miniconda3/envs/qiime2-2019.10/Classifier/gg-13-8-99-nb-classifier.qza"
 QIIME_TEMPLATE_SAMPLE_SHEET="/data/Applications/GitScript/Metagenomic/BasicWorkSheetTemplate2.tsv"
@@ -108,7 +108,7 @@ SetStaticPath(){
 	#Modif_20200130
 	RUN_YEAR=${RUN_NAME:0:4}
         SLBIO_RUN_PATH=${SLBIO_BASE_PATH}"$RUN_NAME/"
-
+	LSPQ_MISEQ_RUN_PATH=${LSPQ_MISEQ_BASE_PATH}${RUN_YEAR}/${RUN_NAME}/
         
 }
 
@@ -180,7 +180,6 @@ GetProjectsNamefromRunName(){
         read -r -a projects_list <<< "$projects_list_temp"
 
         IFS=$IFS_BKP
-        #echo "${projects_list[@]}"
 }
 
 #Modif_20200309
