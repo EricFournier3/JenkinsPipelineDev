@@ -10,41 +10,36 @@ source "/data/Applications/GitScript/JenkinsDev/SetPath.sh"
 SetStaticPath
 GetProjectsNamefromRunName
 
-if [  "${PARAM_SAMPLESHEET_NAME}" = "no_sample_sheet" ]
-  then
+for proj in "${projects_list[@]}"
+	do
+	PROJECT_NAME=$proj
+	SetFinalPath $PROJECT_NAME
+	
+	sample_list=()
+       
+	id_list_file_name=$(cat ${SLBIO_PROJECT_PATH}"CurrentIDlistFileName.txt")
+ 
+	while read myspec
+	  do
 
-	for proj in "${projects_list[@]}"
-		do
-		PROJECT_NAME=$proj
-		SetFinalPath $PROJECT_NAME
-		
-		sample_list=()
-	       
-		id_list_file_name=$(cat ${SLBIO_PROJECT_PATH}"CurrentIDlistFileName.txt")
-	 
-		while read myspec
-		  do
-		  sample_list+=($myspec)          
-		done <  ${id_list_file_name}
+	  if [ ! -s ${SLBIO_FASTQC_BRUT_PATH}${spec}"_R1_fastqc.html" ]
+                  then
+                  echo -e "Fastqc avant trimmomatic pour ${myspec} \t$(date "+%Y-%m-%d @ %H:%M$S")" >> $SLBIO_LOG_FILE
+		  all_fastq_prior_trimmo=$(echo "${SLBIO_FASTQ_BRUT_PATH}${myspec}"*".fastq.gz")
+                  fastqc -q   -o $SLBIO_FASTQC_BRUT_PATH $all_fastq_prior_trimmo
 
-		all_fastq_prior_trimmo=($(echo ${sample_list[@]/#/${SLBIO_FASTQ_BRUT_PATH}}))
-		all_fastq_prior_trimmo="${all_fastq_prior_trimmo[@]/%/_*.fastq.gz}"
-		echo -e "Fastqc avant trimmomatic \t$(date "+%Y-%m-%d @ %H:%M$S")" >> $SLBIO_LOG_FILE
-		fastqc -q   -o $SLBIO_FASTQC_BRUT_PATH $all_fastq_prior_trimmo
+                  echo -e "Fastqc apres trimmomatic pour ${myspec} \t$(date "+%Y-%m-%d @ %H:%M$S")" >> $SLBIO_LOG_FILE
+	          all_fastq_after_trimmo=$(echo "${SLBIO_FASTQ_TRIMMO_PATH}${myspec}"*".fastq.gz")
+                  fastqc -q   -o $SLBIO_FASTQC_TRIMMO_PATH  $all_fastq_after_trimmo
+		  rm "${SLBIO_FASTQC_BRUT_PATH}${myspec}"*".zip" 
+	          rm "${SLBIO_FASTQC_TRIMMO_PATH}${myspec}"*".zip"
+          fi
+	
 
-		all_fastq_after_trimmo=($(echo ${sample_list[@]/#/${SLBIO_FASTQ_TRIMMO_PATH}}))
-		all_fastq_after_trimmo="${all_fastq_after_trimmo[@]/%/_*.fastq.gz}"
+                    
+	done <  ${id_list_file_name}
 
-		echo -e "Fastqc après trimmomatic \t$(date "+%Y-%m-%d @ %H:%M$S")" >> $SLBIO_LOG_FILE
-		fastqc -q   -o $SLBIO_FASTQC_TRIMMO_PATH  $all_fastq_after_trimmo
+done
 
-
-		rm "$SLBIO_FASTQC_BRUT_PATH"*".zip" 
-		rm "$SLBIO_FASTQC_TRIMMO_PATH"*".zip"
-	done
-else
-  :
-fi
 
 exit 0
-

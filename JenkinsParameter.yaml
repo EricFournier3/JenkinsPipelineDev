@@ -76,6 +76,7 @@ coresnv_ref:
    "Mycobacterium chimaera": "CP015267.1"
    "Candida parapsilosis": "HE605209.1"
 coresnv_ref_path: "/data/Databases/CORESNV_REF/"
+coresnv_warning_message: "CoreSVN cancelled for project "
 quast_ref:
  - "Clostridium": ["CP000246.1","bacteria"]
    "Cutibacterium acnes": ["AE017283.1","bacteria"]

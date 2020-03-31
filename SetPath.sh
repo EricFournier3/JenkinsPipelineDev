@@ -5,7 +5,7 @@ Eric Fournier 2019-07-09
 
 HEADER
 CURRENT_YEAR=$(echo $(date +'%Y'))
-PARAM_FILE="/data/Applications/GitScript/Jenkins/JenkinsParameter.yaml"
+PARAM_FILE="/data/Applications/GitScript/JenkinsDev/JenkinsParameter.yaml"
 GET_PARAM_SCRIPT="/data/Applications/GitScript/Jenkins/GetJenkinsParamVal.py"
 RUN_QUAL_SCRIPT="/data/Applications/GitScript/MiSeqRunQuality/MiSeqStat7.py"
 GET_SPECIMENS_SCRIPT="/data/Applications/GitScript/Jenkins/GetSpecimensForTask.py"
@@ -68,6 +68,7 @@ SetStaticPath(){
         white_message="\e[39m"
 	red_message="\e[31m"
 	yellow_message="\e[33m"
+
 
         path_arr=($(/usr/bin/python2.7 $GET_PARAM_SCRIPT  $PARAM_FILE  path  2>&1))
         LSPQ_MISEQ_BASE_PATH=${path_arr[0]}"/"

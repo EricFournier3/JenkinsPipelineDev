@@ -6,7 +6,6 @@ HEADER
 source "/data/Applications/GitScript/JenkinsDev/SetPath.sh"
 SetStaticPath
 
-#TODO supprimer les fichier a la fin
 
 #TODO NE PAS EXECUTER CORESNV SI REFERENCE MANQUANTE    coresnv_warning_message
 
@@ -89,7 +88,6 @@ CheckCoreSnv(){
 	 fi
 	done < ${coresnv_organism_list_file}
 	
-	#echo "CANCELLED PROG ${cancelled_coresnvproj[@]}"
         for pr in ${cancelled_coresnvproj[@]}
           do
           echo -e "${core_snv_warning_message} ${pr}" >> ${warning_file}
