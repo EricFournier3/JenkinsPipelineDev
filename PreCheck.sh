@@ -6,38 +6,84 @@ HEADER
 source "/data/Applications/GitScript/JenkinsDev/SetPath.sh"
 SetStaticPath
 
+#TODO supprimer les fichier a la fin
 
-echo "************* TESTING ERIC"
+#TODO NE PAS EXECUTER CORESNV SI REFERENCE MANQUANTE
 
-# TODO IL FAUT INDIQUER LA REFENCE MANQUANTE ET LE PIPELINE
-# supprimer les fichier a la fin
+#TODO GERER FICHIER FASTQ TROP PETIT
 
-#CHECK QUAST
-
+warning_file=${SLBIO_TEMP_CHECK_DIR}"warnings.log"
 slbio_temp_sample_sheet="${SLBIO_TEMP_CHECK_DIR}${RUN_NAME}.csv"
-slbio_temp_quastref_file="${SLBIO_TEMP_CHECK_DIR}quastref.txt"
-organism_list_file="${SLBIO_TEMP_CHECK_DIR}organism.txt"
 
 sudo cp "${LSPQ_MISEQ_RUN_PATH}${LSPQ_MISEQ_EXPERIMENTAL}${RUN_NAME}.csv"  ${slbio_temp_sample_sheet}
 sudo cp ${PARAM_FILE} ${SLBIO_TEMP_CHECK_DIR} 
 
-#sed -n '/annot_bact\|annot_myc/p' 99990101_test1_C1.csv | awk 'BEGIN{FS=","}{print $11}'
-#sed -n '/annot_bact\|annot_myc\|assemb_bact\|assemb_myc/p' ${slbio_temp_sample_sheet} | awk 'BEGIN{FS=","}{print $11}' | sort | uniq  > ${organism_list_file}
 
-sed -n '/annot_bact\|annot_myc\|assemb_bact\|assemb_myc/p' ${slbio_temp_sample_sheet} | awk 'BEGIN{FS=","}{print $11}'   > ${organism_list_file}
+CheckQuast(){
 
-#sed -n '/^quast_ref/,/^quast_ref_path/p' JenkinsParameter.yaml | sed '1d;$d'
-sed -n '/^quast_ref/,/^quast_ref_path/p' ${SLBIO_TEMP_CHECK_DIR}$(basename ${PARAM_FILE})  | sed '1d;$d'   >  $slbio_temp_quastref_file
+	slbio_temp_quastref_file="${SLBIO_TEMP_CHECK_DIR}quastref.txt"
+	quast_organism_list_file="${SLBIO_TEMP_CHECK_DIR}quast_organism.txt"
 
-#while read line;do echo $line;grep "${line}" JenkinsParameter.yaml;done < organism.txt
+	sed -n '/annot_bact\|annot_myc\|assemb_bact\|assemb_myc/p' ${slbio_temp_sample_sheet} | awk 'BEGIN{FS=","}{print $1"\t"$9"\t"$11}'   > ${quast_organism_list_file}
 
-while read organism
- do
- echo "Organism is ${organism}"
-done < ${organism_list_file}
+	sed -n '/^quast_ref/,/^quast_ref_path/p' ${SLBIO_TEMP_CHECK_DIR}$(basename ${PARAM_FILE})  | sed '1d;$d'   >  $slbio_temp_quastref_file
 
+	while read spec proj organism
+	 do
+	 if   [ ${#organism} -gt 0 ] && grep -w -qs "${organism}" ${slbio_temp_quastref_file} 
+	   then
+           :
+	 else
+           if [ ${#organism} = 0 ]
+             then
+             echo -e "${yellow_message}""WARNING: Missing Quast reference for $spec in project $proj"
+	     echo -e "${white_message}"
+             echo -e "Missing Quast reference for $spec in project $proj" >> ${warning_file}
+           else
+             echo -e "${yellow_message}""WARNING: Quast reference ${organism} for $spec in project $proj is missing from JenkinsParameter.yaml"
+	     echo -e "${white_message}"
+             echo -e "Quast reference ${organism} for $spec in project $proj is missing from JenkinsParameter.yaml" >> ${warning_file}
+           fi
+	 fi
+	done < ${quast_organism_list_file}
 
+}  
 
-#if grep -w  -qs 'Campylobacters jejuni' JenkinsParameter.yaml;then echo "FIND";else echo "NOT FIND";fi
-#if grep -w -qs "${myv}" JenkinsParameter.yaml;then echo "FIND";else echo "NOT FIND";fi
-  
+CheckCoreSnv(){
+
+	slbio_temp_coresnvref_file="${SLBIO_TEMP_CHECK_DIR}coresnvref.txt"
+	coresnv_organism_list_file="${SLBIO_TEMP_CHECK_DIR}coresnv_organism.txt"
+
+	sed -n '/epidemio/p' ${slbio_temp_sample_sheet} | awk 'BEGIN{FS=","}{print $1"\t"$9"\t"$11}'   > ${coresnv_organism_list_file}
+	sed -n '/^coresnv_ref/,/^coresnv_ref_path/p' ${SLBIO_TEMP_CHECK_DIR}$(basename ${PARAM_FILE})  | sed '1d;$d'   >  $slbio_temp_coresnvref_file
+
+	while read spec proj organism
+	 do
+	 if   [ ${#organism} -gt 0 ] && grep -w -qs "${organism}" ${slbio_temp_coresnvref_file} 
+	   then
+           :
+	 else
+           if [ ${#organism} = 0 ]
+             then
+             echo -e "${yellow_message}""WARNING: Missing CoreSNV reference for $spec in project $proj"
+	     echo -e "${white_message}"
+             echo -e "Missing CoreSNV reference for $spec in project $proj" >> ${warning_file}
+           else
+             echo -e "${yellow_message}""WARNING: CoreSNV reference ${organism} for $spec in project $proj is missing from JenkinsParameter.yaml"
+	     echo -e "${white_message}"
+             echo -e "CoreSNV reference ${organism} for $spec in project $proj is missing from JenkinsParameter.yaml" >> ${warning_file}
+           fi
+	 fi
+	done < ${coresnv_organism_list_file}
+
+}
+
+CheckQuast
+CheckCoreSnv
+
+if [ -s ${warning_file} ]
+  then
+  cp ${warning_file} $SLBIO_RUN_PATH
+fi
+
+sudo rm "${SLBIO_TEMP_CHECK_DIR}"*
