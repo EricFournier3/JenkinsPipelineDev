@@ -8,7 +8,7 @@ SetStaticPath
 
 #TODO supprimer les fichier a la fin
 
-#TODO NE PAS EXECUTER CORESNV SI REFERENCE MANQUANTE
+#TODO NE PAS EXECUTER CORESNV SI REFERENCE MANQUANTE    coresnv_warning_message
 
 #TODO GERER FICHIER FASTQ TROP PETIT
 
@@ -17,6 +17,9 @@ slbio_temp_sample_sheet="${SLBIO_TEMP_CHECK_DIR}${RUN_NAME}.csv"
 
 sudo cp "${LSPQ_MISEQ_RUN_PATH}${LSPQ_MISEQ_EXPERIMENTAL}${RUN_NAME}.csv"  ${slbio_temp_sample_sheet}
 sudo cp ${PARAM_FILE} ${SLBIO_TEMP_CHECK_DIR} 
+
+core_snv_warning_message=$(echo $(grep 'coresnv_warning_message' ${PARAM_FILE}) | cut -d ':' -f 2)
+core_snv_warning_message=$(echo ${core_snv_warning_message//\"/})
 
 
 CheckQuast(){
@@ -51,6 +54,8 @@ CheckQuast(){
 
 CheckCoreSnv(){
 
+        cancelled_coresnvproj=()
+
 	slbio_temp_coresnvref_file="${SLBIO_TEMP_CHECK_DIR}coresnvref.txt"
 	coresnv_organism_list_file="${SLBIO_TEMP_CHECK_DIR}coresnv_organism.txt"
 
@@ -63,6 +68,14 @@ CheckCoreSnv(){
 	   then
            :
 	 else
+
+	   if [[ " ${cancelled_coresnvproj[@]} " =~ " $proj " ]]
+	     then
+             :
+           else
+                cancelled_coresnvproj+=($proj)
+	   fi
+
            if [ ${#organism} = 0 ]
              then
              echo -e "${yellow_message}""WARNING: Missing CoreSNV reference for $spec in project $proj"
@@ -75,7 +88,12 @@ CheckCoreSnv(){
            fi
 	 fi
 	done < ${coresnv_organism_list_file}
-
+	
+	#echo "CANCELLED PROG ${cancelled_coresnvproj[@]}"
+        for pr in ${cancelled_coresnvproj[@]}
+          do
+          echo -e "${core_snv_warning_message} ${pr}" >> ${warning_file}
+	done
 }
 
 CheckQuast
