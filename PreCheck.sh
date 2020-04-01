@@ -11,14 +11,18 @@ SetStaticPath
 
 #TODO GERER FICHIER FASTQ TROP PETIT
 
-warning_file=${SLBIO_TEMP_CHECK_DIR}"warnings.log"
-slbio_temp_sample_sheet="${SLBIO_TEMP_CHECK_DIR}${RUN_NAME}.csv"
+
+if [ ${PARAM_SAMPLESHEET_NAME} = "no_sample_sheet" ]
+  then
+  slbio_temp_sample_sheet="${SLBIO_TEMP_CHECK_DIR}${RUN_NAME}.csv"
+else
+  slbio_temp_sample_sheet="${SLBIO_TEMP_CHECK_DIR}${PARAM_SAMPLESHEET_NAME}"
+fi
+
+warning_file=${SLBIO_TEMP_CHECK_DIR}"warnings_$(basename ${slbio_temp_sample_sheet}).log"
 
 sudo cp "${LSPQ_MISEQ_RUN_PATH}${LSPQ_MISEQ_EXPERIMENTAL}${RUN_NAME}.csv"  ${slbio_temp_sample_sheet}
 sudo cp ${PARAM_FILE} ${SLBIO_TEMP_CHECK_DIR} 
-
-core_snv_warning_message=$(echo $(grep 'coresnv_warning_message' ${PARAM_FILE}) | cut -d ':' -f 2)
-core_snv_warning_message=$(echo ${core_snv_warning_message//\"/})
 
 
 CheckQuast(){
@@ -79,18 +83,18 @@ CheckCoreSnv(){
              then
              echo -e "${yellow_message}""WARNING: Missing CoreSNV reference for $spec in project $proj"
 	     echo -e "${white_message}"
-             echo -e "Missing CoreSNV reference for $spec in project $proj" >> ${warning_file}
+             echo -e "Missing CoreSNV reference for $spec in project $proj / $(basename ${slbio_temp_sample_sheet})" >> ${warning_file}
            else
              echo -e "${yellow_message}""WARNING: CoreSNV reference ${organism} for $spec in project $proj is missing from JenkinsParameter.yaml"
 	     echo -e "${white_message}"
-             echo -e "CoreSNV reference ${organism} for $spec in project $proj is missing from JenkinsParameter.yaml" >> ${warning_file}
+             echo -e "CoreSNV reference ${organism} for $spec in project $proj / $(basename ${slbio_temp_sample_sheet})  is missing from JenkinsParameter.yaml" >> ${warning_file}
            fi
 	 fi
 	done < ${coresnv_organism_list_file}
 	
         for pr in ${cancelled_coresnvproj[@]}
           do
-          echo -e "${core_snv_warning_message} ${pr}" >> ${warning_file}
+          echo -e "${core_snv_warning_message} ${pr} / $(basename ${slbio_temp_sample_sheet})" >> ${warning_file}
 	done
 }
 

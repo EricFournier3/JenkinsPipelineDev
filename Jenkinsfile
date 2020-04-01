@@ -27,8 +27,20 @@ pipeline {
                     //sh "/data/Applications/GitScript/JenkinsDev/InitGenomicPipeline.sh"
                     //plus necessaire le ComputeMiSeqStat
                     //sh "/data/Applications/GitScript/JenkinsDev/Tools.sh ComputeMiSeqStat"
+		    //plus necessaire le check CoreSnvReference
                     //sh '/data/Applications/GitScript/JenkinsDev/Tools.sh CoreSnvReference'
             }
+        }
+        stage('PreCheck'){
+            environment{
+                RUN_NAME = "${params.runName}"
+                PARAM_SAMPLESHEET_NAME = "${params.SampleSheetName}"
+            }
+            steps{
+                echo "Stage PreCheck"
+                sh "/data/Applications/GitScript/JenkinsDev/PreCheck.sh"
+            }
+            
         }
         stage('Trimmomatic'){
             environment{

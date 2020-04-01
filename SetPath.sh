@@ -27,6 +27,8 @@ CENTRIFUGEDB="/data/Databases/CENTRIFUGE_DB/abv"
 CLARKDB="/data/Databases/CLARK_DB"
 CORE_SNV_GALAXY_URL="http://localhost:48890/"
 CORE_SNV_GALAXY_KEY="0abbae19c25ebcf2d75f059af756ea05"
+core_snv_warning_message=$(echo $(grep 'coresnv_warning_message' ${PARAM_FILE}) | cut -d ':' -f 2)
+core_snv_warning_message=$(echo ${core_snv_warning_message//\"/})
 
 slbio_user=$(whoami)
 ldap_user=$(echo ${slbio_user} | cut -d '@' -f 1)
