@@ -127,6 +127,38 @@ CreateSampleSheetForNewPipeline(){
    
     awk -v project=$PROJECT_NAME 'BEGIN{FS=","}{if($9 == project){print $1}}' "${SLBIO_PROJECT_PATH}${PARAM_SAMPLESHEET_NAME}" > ${SLBIO_PROJECT_PATH}${id_list_file_name} 
     
+
+    myarr=();
+    for i in $(cat ${SLBIO_PROJECT_PATH}${id_list_file_name})
+        do
+	myarr+=($i)
+    done
+
+    for j in ${myarr[@]}
+        do
+	  if ls "${SLBIO_FASTQ_BRUT_PATH}"* 1>/dev/null 2>&1
+            then
+            :
+          else
+	    ln -s ${LSPQ_MISEQ_FASTQ_PATH}${j}"_"*".fastq.gz" $SLBIO_FASTQ_BRUT_PATH  2>/dev/null
+            MYPAIR_R1=$(echo "${SLBIO_FASTQ_BRUT_PATH}${j}_"*"R1_001.fastq.gz")
+            MYPAIR_R2=$(echo "${SLBIO_FASTQ_BRUT_PATH}${j}_"*"R2_001.fastq.gz")
+
+	    myfastq_base_r1=$(basename $MYPAIR_R1)
+            myfastq_base_r2=$(basename $MYPAIR_R2)
+
+	    mynew_fastq_base_r1=$(echo $myfastq_base_r1 | cut -d '_' -f1,4)".fastq.gz"
+            mynew_fastq_base_r2=$(echo $myfastq_base_r2 | cut -d '_' -f1,4)".fastq.gz"
+
+	    MYNEW_PAIR_R1=${SLBIO_FASTQ_BRUT_PATH}${mynew_fastq_base_r1}
+            MYNEW_PAIR_R2=${SLBIO_FASTQ_BRUT_PATH}${mynew_fastq_base_r2}
+
+	    mv ${MYPAIR_R1} ${MYNEW_PAIR_R1}
+            mv ${MYPAIR_R2} ${MYNEW_PAIR_R2}
+
+          fi
+    done
+
 }
 
 
