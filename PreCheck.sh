@@ -6,22 +6,21 @@ HEADER
 source "/data/Applications/GitScript/JenkinsDev/SetPath.sh"
 SetStaticPath
 
-
-#TODO NE PAS EXECUTER CORESNV SI REFERENCE MANQUANTE    coresnv_warning_message
-
 #TODO GERER FICHIER FASTQ TROP PETIT
 
+sudo rm "${SLBIO_TEMP_CHECK_DIR}"* 2>/dev/null
 
 if [ ${PARAM_SAMPLESHEET_NAME} = "no_sample_sheet" ]
   then
   slbio_temp_sample_sheet="${SLBIO_TEMP_CHECK_DIR}${RUN_NAME}.csv"
+  sudo cp "${LSPQ_MISEQ_RUN_PATH}${LSPQ_MISEQ_EXPERIMENTAL}${RUN_NAME}.csv"  ${slbio_temp_sample_sheet}
 else
   slbio_temp_sample_sheet="${SLBIO_TEMP_CHECK_DIR}${PARAM_SAMPLESHEET_NAME}"
+  sudo cp "${LSPQ_MISEQ_RUN_PATH}${LSPQ_MISEQ_EXPERIMENTAL}${PARAM_SAMPLESHEET_NAME}"  ${slbio_temp_sample_sheet}
 fi
 
 warning_file=${SLBIO_TEMP_CHECK_DIR}"warnings_$(basename ${slbio_temp_sample_sheet}).log"
 
-sudo cp "${LSPQ_MISEQ_RUN_PATH}${LSPQ_MISEQ_EXPERIMENTAL}${RUN_NAME}.csv"  ${slbio_temp_sample_sheet}
 sudo cp ${PARAM_FILE} ${SLBIO_TEMP_CHECK_DIR} 
 
 
@@ -100,6 +99,11 @@ CheckCoreSnv(){
 
 CheckQuast
 CheckCoreSnv
+
+if [ -s "${SLBIO_RUN_PATH}$(basename ${warning_file})" ]
+  then
+  sudo rm "${SLBIO_RUN_PATH}$(basename ${warning_file})" 
+fi
 
 if [ -s ${warning_file} ]
   then

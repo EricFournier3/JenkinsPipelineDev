@@ -93,16 +93,15 @@ for proj in "${projects_list[@]}"
           warning_suffix=${PARAM_SAMPLESHEET_NAME}
 	fi
 
-	echo "WARNING SUFFIX IS ${warning_suffix}"
 
-	if [ -s "${SLBIO_RUN_PATH}""warnings.log" ]
+	if [ -s "${SLBIO_RUN_PATH}""warnings_${warning_suffix}.log" ]
           then
 
-	  if grep -qs "${core_snv_warning_message} ${proj}" "${SLBIO_RUN_PATH}""warnings.log"
+	  if grep -qs "${core_snv_warning_message} ${proj} / ${warning_suffix}" "${SLBIO_RUN_PATH}""warnings_${warning_suffix}.log"
 	    then
-            echo "MESSAGE IS  "${core_snv_warning_message} ${proj}
-	    echo "*************** CORE CANCELLEDDDDDDDDDDDDDDD for ${proj}"
             continue    
+	  else
+	    :
 	  fi
         fi
 
@@ -148,27 +147,26 @@ for proj in "${projects_list[@]}"
 			then
 			ref_file=$(grep -l "$acc" ${refpath}{*.fna,*.fa,*.fasta} 2>/dev/null  | head -n 1)
 		else 
-		   #HERE ERIC ncbi-acc-download -m nucleotide -F fasta  -o  ${refpath}${acc}".fna"  $acc 
+		   ncbi-acc-download -m nucleotide -F fasta  -o  ${refpath}${acc}".fna"  $acc 
 		   ref_file=${refpath}${acc}".fna"
 		fi
 
-                #HERE ERIC nb_contig=$(sed -n '/>/p' ${ref_file} | wc -l)
-                # HERE ERIC if [ $nb_contig > 1 ]
-		#HERE ERIC	then
-		#HERE ERIC	ConcatContig
-		#ERIC fi
+                nb_contig=$(sed -n '/>/p' ${ref_file} | wc -l)
+                if [ $nb_contig > 1 ]
+		  then
+		  ConcatContig
+		fi
 
- 
 		temp_fastq_dir=${SLBIO_FASTQ_TRIMMO_PATH}"TEMP/"
 
-		#HERE ERIC mkdir  $temp_fastq_dir
+		mkdir  $temp_fastq_dir
 
 		for spec in "${spec_arr[@]}"
 			do 
 			for primer in R1 R2
 				do
 			        :	
-				#HERE ERIC cp ${SLBIO_FASTQ_TRIMMO_PATH}${spec}"_${primer}_PAIR.fastq.gz" ${temp_fastq_dir}${spec}"_${primer}.fastq.gz"
+				cp ${SLBIO_FASTQ_TRIMMO_PATH}${spec}"_${primer}_PAIR.fastq.gz" ${temp_fastq_dir}${spec}"_${primer}.fastq.gz"
 			done	
 		done
 
@@ -189,40 +187,40 @@ for proj in "${projects_list[@]}"
 		  :
 		else
 		  :
-                  #HERE ERIC sudo docker start SnvPhy_EricF2
+                  sudo docker start SnvPhy_EricF2
 		fi
  
 		coresnv_cmd="sudo /usr/bin/python2.7 $CORESNV_EXEC --galaxy-url ${CORE_SNV_GALAXY_URL} --galaxy-api-key ${CORE_SNV_GALAXY_KEY} --fastq-dir $temp_fastq_dir --reference-file $ref_file --min-coverage 20 --output-dir ${SLBIO_CORESNV_PATH} --min-mean-mapping 30 --relative-snv-abundance 0.75  --filter-density-window 20  --filter-density-threshold 2 --run-name ${RUN_NAME} --map-outdir ${SLBIO_CORESNV_MAP_DIR}"
 	
 		position2phyloviz_cmd="sudo perl $POSITION2PHYLOVIZ_SCRIPT -i ${SLBIO_CORESNV_PATH}snvTable.tsv --reference-name $acc -b ${SLBIO_CORESNV_PATH}prefix"
 	
-         	#HERE ERIC eval $coresnv_cmd
+         	eval $coresnv_cmd
 			
-         	#HERE ERIC eval $position2phyloviz_cmd
+         	eval $position2phyloviz_cmd
 
-		#HERE ERIC sudo chmod 777 ${SLBIO_CORESNV_PATH}
+		sudo chmod 777 ${SLBIO_CORESNV_PATH}
 
-		#HERE ERIC MakeGrapeTreeProfile
+		MakeGrapeTreeProfile
 
 		if [ -s $LSPQ_MISEQ_CORESNV_METADATA_FILE_PATH ]
 			then
 		        :
-			#HERE ERIC sudo cp $LSPQ_MISEQ_CORESNV_METADATA_FILE_PATH "${SLBIO_CORESNV_PATH}metadata.tsv"
-			#HERE ERIC MakeGrapeTreeMetadata
+			sudo cp $LSPQ_MISEQ_CORESNV_METADATA_FILE_PATH "${SLBIO_CORESNV_PATH}metadata.tsv"
+			MakeGrapeTreeMetadata
 		fi
 
 		grapetree_cmd="/usr/bin/python2.7 $GRAPETREE_SCRIPT -p $grapetree_profile_file -m MSTreeV2 > ${SLBIO_CORESNV_PATH}grapetree-tree.nwk"
-		#HERE ERIC eval $grapetree_cmd
+		eval $grapetree_cmd
 
-		#HERE ERIC rm -r $temp_fastq_dir
+		rm -r $temp_fastq_dir
 	
 		#indexer les fichiers bam
-		#HERE ERIC IndexBamFile
+		IndexBamFile
 	
 		if [ -e  ${refpath}${acc}"_temp.fna" ]
 			then
 	                :
-			#HERE ERIC rm ${refpath}${acc}"_temp.fna"
+			rm ${refpath}${acc}"_temp.fna"
 		fi
 	else
 	        :
