@@ -120,6 +120,8 @@ CreateSampleSheetForNewPipeline(){
     awk '{sub("\r$", "");print}' "${SLBIO_PROJECT_PATH}${PARAM_SAMPLESHEET_NAME}" >  "${SLBIO_PROJECT_PATH}${PARAM_SAMPLESHEET_NAME}.temp"
     sed -n '/Sample_ID/,$p' "${SLBIO_PROJECT_PATH}${PARAM_SAMPLESHEET_NAME}.temp" > "${SLBIO_PROJECT_PATH}${PARAM_SAMPLESHEET_NAME}.temp2"
 
+    sed -i '/pulsenet/{s/,2,/,pulsenet,/g}' "${SLBIO_PROJECT_PATH}${PARAM_SAMPLESHEET_NAME}.temp2"
+
     awk -v project=$PROJECT_NAME 'BEGIN{FS=","}{if($9 == project || $1 == "Sample_Name"){print $0}}' "${SLBIO_PROJECT_PATH}${PARAM_SAMPLESHEET_NAME}.temp2" > "${SLBIO_PROJECT_PATH}${PARAM_SAMPLESHEET_NAME}.temp3"
    
     sudo rm  "${SLBIO_PROJECT_PATH}${PARAM_SAMPLESHEET_NAME}"
@@ -136,7 +138,7 @@ CreateSampleSheetForNewPipeline(){
 
     for j in ${myarr[@]}
         do
-	  if ls "${SLBIO_FASTQ_BRUT_PATH}"* 1>/dev/null 2>&1
+	  if ls "${SLBIO_FASTQ_BRUT_PATH}${j}_"* 1>/dev/null 2>&1
             then
             :
           else
@@ -178,6 +180,8 @@ CreateSymLink(){
 	    sudo cp "${LSPQ_MISEQ_RUN_PATH}${LSPQ_MISEQ_EXPERIMENTAL}${RUN_NAME}_${cartridge}.csv"  $SLBIO_PROJECT_PATH
 	    sample_sheet_name=$(basename "${LSPQ_MISEQ_RUN_PATH}${LSPQ_MISEQ_EXPERIMENTAL}${RUN_NAME}_${cartridge}.csv")
 
+	    sed -i '/pulsenet/{s/,2,/,pulsenet,/g}' ${SLBIO_PROJECT_PATH}${sample_sheet_name}
+
 	    awk '{sub("\r$", "");print}' ${SLBIO_PROJECT_PATH}${sample_sheet_name} > ${SLBIO_PROJECT_PATH}${sample_sheet_name}".temp"
 	   
 	    #Supprimer le header
@@ -191,6 +195,7 @@ CreateSymLink(){
 	  done
 
 	  sed  '2,${/Sample_Name/d}' ${SLBIO_PROJECT_PATH}${final_sample_sheet_name}".temp" > ${SLBIO_PROJECT_PATH}${final_sample_sheet_name}
+
 	  awk -v project=$PROJECT_NAME 'BEGIN{FS=","}{if($9 == project){print $1}}' ${SLBIO_PROJECT_PATH}${final_sample_sheet_name}  > ${SLBIO_PROJECT_PATH}${id_list_file_name}
 
 	  CountNumberOfCoreSnvSpec
