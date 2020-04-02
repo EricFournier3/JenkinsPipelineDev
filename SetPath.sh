@@ -16,7 +16,6 @@ CORESNV_EXEC="/data/Applications/SnvPhyl_Client/snvphyl-galaxy-cli/bin/snvphyl.p
 POSITION2PHYLOVIZ_SCRIPT="/data/Applications/GitScript/Jenkins/positions2phyloviz.pl"
 FUNANNOTATE_SCRIPT="/home/foueri01@inspq.qc.ca/InternetProgram/Funannotate/funannotate/funannotate.py"
 GRAPETREE_SCRIPT="/data/Applications/GrapeTree/grapetree.py"
-#PASS_FILE="/home/foueri01@inspq.qc.ca/pass.txt"
 PARSE_SPEC_TAXON_SCRIPT="/data/Applications/GitScript/Jenkins/ParseQiime.awk"
 SILVA_CLASSIFIER="/data/Applications/Miniconda/miniconda3/envs/qiime2-2019.10/Classifier/silva-132-99-nb-classifier.qza"
 GREENGENE_CLASSIFIER="/data/Applications/Miniconda/miniconda3/envs/qiime2-2019.10/Classifier/gg-13-8-99-nb-classifier.qza"
@@ -108,7 +107,6 @@ SetStaticPath(){
 	SLBIO_CLARK=${SLBIO_METAGENOMIC_SHOTGUN}${slbio_subdir_arr[19]}"/"
 	SLBIO_CORESNV_MAP_DIR=${slbio_subdir_arr[20]}"/"
 	GENOME_LENGTH_FILE=($(/usr/bin/python2.7 $GET_PARAM_SCRIPT  $PARAM_FILE  genome_length_file  2>&1))
-	#Modif_20200130
 	RUN_YEAR=${RUN_NAME:0:4}
         SLBIO_RUN_PATH=${SLBIO_BASE_PATH}"$RUN_NAME/"
 	LSPQ_MISEQ_RUN_PATH=${LSPQ_MISEQ_BASE_PATH}${RUN_YEAR}/${RUN_NAME}/
@@ -118,21 +116,15 @@ SetStaticPath(){
 
 SetFinalPath(){
 	PROJECT_NAME=$1
-	#Modif_20200130
         LSPQ_MISEQ_RUN_PATH=${LSPQ_MISEQ_BASE_PATH}${RUN_YEAR}/${RUN_NAME}/
-	#echo "LSPQ_MISEQ_RUN_PATH ${LSPQ_MISEQ_RUN_PATH}" 
-	#Modif_20200130
 	LSPQ_MISEQ_RUN_PATH_FROM_SPARTAGE=${LSPQ_MISEQ_BASE_PATH_FROM_SPARTAGE}${RUN_YEAR}"\\\\"${RUN_NAME}"\\\\"
-	#echo "LSPQ_MISEQ_RUN_PATH_FROM_SPARTAGE ${LSPQ_MISEQ_RUN_PATH_FROM_SPARTAGE}"
 	LSPQ_MISEQ_ANALYSES_PATH=${LSPQ_MISEQ_RUN_PATH}${LSPQ_ANALYSES}
 	LSPQ_MISEQ_ANALYSIS_PROJECT_PATH=${LSPQ_MISEQ_ANALYSES_PATH}${PROJECT_NAME}/
 	LSPQ_MISEQ_ANALYSE_PATH_FROM_SPARTAGE=${LSPQ_MISEQ_RUN_PATH_FROM_SPARTAGE}${LSPQ_ANALYSES}
         LSPQ_MISEQ_SAMPLESHEET_PATH=${LSPQ_MISEQ_RUN_PATH}${LSPQ_MISEQ_EXPERIMENTAL}"${RUN_NAME}.csv"
         LSPQ_MISEQ_FASTQ_PATH=${LSPQ_MISEQ_RUN_PATH}${LSPQ_MISEQ_SEQ_BRUT}
 
-	#Modif_20200130
         LSPQ_MISEQ_RUNQUALFILE_PATH=${LSPQ_MISEQ_BASE_PATH}${RUN_YEAR}/${RUN_NAME}"/"${LSPQ_MISEQ_MISEQ_RUN_TRACE}"MiSeqStat_"*
-	#Modif_20200130
 	LSPQ_MISEQ_PROJ_DESC_PATH=${LSPQ_MISEQ_BASE_PATH}${RUN_YEAR}/${RUN_NAME}"/"${LSPQ_MISEQ_EXPERIMENTAL}${PROJECT_NAME}"_desc.txt"
 
         SLBIO_RUN_PATH=${SLBIO_BASE_PATH}"$RUN_NAME/"
@@ -154,9 +146,7 @@ SetFinalPath(){
 	SLBIO_QIIME_PATH=${SLBIO_PROJECT_PATH}${SLBIO_QIIME}
         SLBIO_LOG_PATH=${SLBIO_PROJECT_PATH}${SLBIO_LOG}
         SLBIO_LOG_FILE=${SLBIO_LOG_PATH}"JenkinsLog.log"
-	#Modif_20200130
 	LSPQ_MISEQ_SAMPLE_LIST_TO_ADD_FILE_PATH=${LSPQ_MISEQ_BASE_PATH}${RUN_YEAR}/${RUN_NAME}"/1_Experimental/CoreSnvSamplesToAdd_"${RUN_NAME}"_${PROJECT_NAME}.txt"
-	#Modif_20200130
 	LSPQ_MISEQ_CORESNV_METADATA_FILE_PATH=${LSPQ_MISEQ_BASE_PATH}${RUN_YEAR}/${RUN_NAME}"/1_Experimental/CoreSnvMetadata_"${RUN_NAME}"_${PROJECT_NAME}.txt"
 	SLBIO_WEBREPORT_PATH=${SLBIO_PROJECT_PATH}${SLBIO_WEBREPORT}
 	SLBIO_METAGENOMIC_SHOTGUN_PATH=${SLBIO_PROJECT_PATH}${SLBIO_METAGENOMIC_SHOTGUN}
@@ -164,16 +154,8 @@ SetFinalPath(){
 	SLBIO_CENTRIFUGE_PATH=${SLBIO_PROJECT_PATH}${SLBIO_CENTRIFUGE}
 	SLBIO_CLARK_PATH=${SLBIO_PROJECT_PATH}${SLBIO_CLARK}
 
-	#Modif_20200309
 	LSPQ_MISEQ_TRACE_PATH=${LSPQ_MISEQ_RUN_PATH}${LSPQ_MISEQ_MISEQ_RUN_TRACE}
 
-#        GetAllCartridge
-#        GetCurrentCartridge
-
-#	echo "============ current_cartridge_list ${current_cartridge_list[@]}"
-#	echo "============ all_cartridge_list ${all_cartridge_list[@]}"
-
- #       BuildSampleSheetName
 }
 
 GetProjectsNamefromRunName(){
@@ -185,16 +167,12 @@ GetProjectsNamefromRunName(){
         IFS=$IFS_BKP
 }
 
-#Modif_20200309
-
-
 
 GetCurrentCartridge(){
    current_cartridge_list=()
 
   if [ "$1" = "newpipeline" ]
     then
-    #echo "NEW PIPELINE NEEDED"
     echo ${SLBIO_PROJECT_PATH}"CartridgeDone.txt"
     while read cartridge
       do
@@ -227,8 +205,6 @@ GetCurrentCartridge(){
     done
 
   else
-   # echo "NEWWWWWWWWWWWWWWWWWWW"
-    #echo "ALL " ${all_cartridge_list[@]}
     new_run="true"
     current_cartridge_list=(${all_cartridge_list[@]})
   fi
@@ -242,22 +218,16 @@ GetCurrentCartridge(){
 }
 
 GetAllCartridge(){
-  #echo "HERE 1"
   all_cartridge_list=()
   for cartridge in $(ls -d "${LSPQ_MISEQ_TRACE_PATH}"*"/")
     do
-   # echo "CARTRIDGE "$cartridge
     all_cartridge=$(basename ${cartridge})
     all_cartridge_list+=(${all_cartridge})
   done
  
-  #echo "ALL CARTYRIDGE "${all_cartridge_list[@]} 
-  
-  
 }
 
 
-#Modif_20200309
 GetDoneCartridge(){
   done_cartridge_list=()
 
@@ -271,17 +241,13 @@ GetDoneCartridge(){
   fi
 }
 
-#Modif_20200309
 BuildSampleSheetName(){
 
   if [ "$1" = "newpipeline" ]
     then 
-   # echo  "MY RUN NAME "${RUN_NAME}
     final_sample_sheet_name="$2"
-    #echo "FOR NEW PIPELINE SAMPLESHEET IS ${final_sample_sheet_name}"
     samplesheet_suffix=$(echo ${final_sample_sheet_name/%.csv/} | cut -d '_' -f 3)
     id_list_file_name="ID_list_"${samplesheet_suffix}".txt"
-   # echo "ID LIST FILE NAME "${id_list_file_name}
     echo ${SLBIO_PROJECT_PATH}${id_list_file_name} > ${SLBIO_PROJECT_PATH}"CurrentIDlistFileName.txt"
     echo ${SLBIO_PROJECT_PATH}${final_sample_sheet_name} > ${SLBIO_PROJECT_PATH}"CurrentSampleSheetName.txt"
     return 
@@ -289,18 +255,11 @@ BuildSampleSheetName(){
 
 
   suffix=$(printf "%s_" "${current_cartridge_list[@]}")
-  #echo "suffix before "$suffix
   samplesheet_suffix=${suffix%_}
-  #prefix=$(basename "${LSPQ_MISEQ_RUN_PATH}${LSPQ_MISEQ_EXPERIMENTAL}${RUN_NAME}")
   prefix=${RUN_NAME}
-
-  #echo "Suffix ${samplesheet_suffix}"
-  #echo "prefix ${prefix}"
 
   final_sample_sheet_name=${prefix}_${samplesheet_suffix}"_final.csv"
   id_list_file_name="ID_list_"${samplesheet_suffix}".txt"
- # echo "---- final_sample_sheet_name ${final_sample_sheet_name}"
- # echo "----id_list_file_name ${id_list_file_name}"
 
   echo ${SLBIO_PROJECT_PATH}${id_list_file_name} > ${SLBIO_PROJECT_PATH}"CurrentIDlistFileName.txt"  
   echo ${SLBIO_PROJECT_PATH}${final_sample_sheet_name} > ${SLBIO_PROJECT_PATH}"CurrentSampleSheetName.txt" 
