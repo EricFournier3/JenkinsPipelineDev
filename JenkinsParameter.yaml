@@ -53,7 +53,7 @@ jenkins_step:
    metabarcoding: ["Qiime"]
    pulsenet: ["Trimmomatic","Fastqc"]
    metagenomique: ["Metagenomic"]
-   na: []
+   na: [""]
 organism:
  - salmonella: 5000000
    ecoli: 5000000

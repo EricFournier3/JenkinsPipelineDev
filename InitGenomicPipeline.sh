@@ -210,9 +210,20 @@ CreateSymLink(){
 				myarr+=($i)
 			done
 
+                        touch ${SLBIO_PROJECT_PATH}"RejectedSamples.txt"
+
 			for j in ${myarr[@]}
 				do
 				ln -s ${LSPQ_MISEQ_FASTQ_PATH}${j}"_"*".fastq.gz" $SLBIO_FASTQ_BRUT_PATH
+			        fastqsize=$(du -ch -b -L ${SLBIO_FASTQ_BRUT_PATH}${j}"_"*".fastq.gz" | grep total | awk '{print $1}')
+                                
+				if [ $fastqsize -lt 1000000 ]
+                                  then 
+                                  echo -e  "${j}\t${fastqsize}" >> ${SLBIO_PROJECT_PATH}"RejectedSamples.txt"
+                                  spec_pipeline=$(awk -v spec_id="^${j}$" 'BEGIN{FS=","} $1 ~ spec_id {print $10}' ${SLBIO_PROJECT_PATH}${final_sample_sheet_name})
+
+                                 sed -i "/${j},/{s/,${spec_pipeline},/,na,/g}" ${SLBIO_PROJECT_PATH}${final_sample_sheet_name}  
+                                fi
 			done
 	  fi
 fi
