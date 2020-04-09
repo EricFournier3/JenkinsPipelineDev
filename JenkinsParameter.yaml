@@ -96,5 +96,6 @@ quast_ref:
    "Pseudomonas aeruginosa": ["NC_009656.1","bacteria"]
    "Mycoplasma hominis": ["NC_013511.1","bacteria"] 
 quast_ref_path: "/data/Databases/QUAST_REF/"
+reject_samples_filename: "RejectedSamples.txt"
 ...
 

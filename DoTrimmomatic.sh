@@ -21,7 +21,8 @@ ADAPTFILE="/data/Applications/Trimmomatic/Trimmomatic-0.36/adapters/NexteraPE-PE
 		SetFinalPath $PROJECT_NAME
 
 		id_list_file_name=$(cat ${SLBIO_PROJECT_PATH}"CurrentIDlistFileName.txt") 
-
+		reject_file=${SLBIO_PROJECT_PATH}$(echo $(sed -n -E 's/reject_samples_filename: "(.+)"/\1/pg' ${PARAM_FILE}))
+		
 		while read myspec
 		  do
 
@@ -38,7 +39,7 @@ ADAPTFILE="/data/Applications/Trimmomatic/Trimmomatic-0.36/adapters/NexteraPE-PE
 		  
 		  TRIMMO_CMD="java -jar $EXEC PE -threads 8   -phred33 $PAIR_R1 $PAIR_R2 $PAIR_R1_TRIMMO $UNPAIR_R1_TRIMMO $PAIR_R2_TRIMMO $UNPAIR_R2_TRIMMO LEADING:20 TRAILING:20 SLIDINGWINDOW:4:20 MINLEN:50 ILLUMINACLIP:$ADAPTFILE:2:30:10 2>$LOGFILE"
 
-                  if [ ! -s  ${PAIR_R1_TRIMMO} ]
+                  if ! grep -w -qs "${myspec}" ${reject_file} &&  [ ! -s  ${PAIR_R1_TRIMMO} ]
 		    then
 		    echo -e "Trimmomatic pour ${myspec}\t$(date "+%Y-%m-%d @ %H:%M$S")" >> $SLBIO_LOG_FILE
 		    eval ${TRIMMO_CMD}

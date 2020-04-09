@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source "/data/Applications/GitScript/Jenkins/SetPath.sh"
+source "/data/Applications/GitScript/JenkinsDev/SetPath.sh"
 SetStaticPath
 GetProjectsNamefromRunName
 

@@ -6,11 +6,10 @@ Eric Fournier 2019-07-09
 HEADER
 
 
-source "/data/Applications/GitScript/Jenkins/SetPath.sh"
-source "/data/Applications/GitScript/Jenkins/Tools.sh"
+source "/data/Applications/GitScript/JenkinsDev/SetPath.sh"
+source "/data/Applications/GitScript/JenkinsDev/Tools.sh"
 SetStaticPath
 GetProjectsNamefromRunName
-
 
 BuildSlbioStruct(){
 	if [ -d $SLBIO_RUN_PATH ]
@@ -210,19 +209,22 @@ CreateSymLink(){
 				myarr+=($i)
 			done
 
-                        touch ${SLBIO_PROJECT_PATH}"RejectedSamples.txt"
+		
+                        reject_file=$(echo $(sed -n -E 's/reject_samples_filename: "(.+)"/\1/pg' ${PARAM_FILE}))
+                        touch ${SLBIO_PROJECT_PATH}${reject_file}
 
 			for j in ${myarr[@]}
 				do
 				ln -s ${LSPQ_MISEQ_FASTQ_PATH}${j}"_"*".fastq.gz" $SLBIO_FASTQ_BRUT_PATH
 			        fastqsize=$(du -ch -b -L ${SLBIO_FASTQ_BRUT_PATH}${j}"_"*".fastq.gz" | grep total | awk '{print $1}')
                                 
+                                #fastq trop petit
 				if [ $fastqsize -lt 1000000 ]
                                   then 
-                                  echo -e  "${j}\t${fastqsize}" >> ${SLBIO_PROJECT_PATH}"RejectedSamples.txt"
+                                  echo -e  "${j}\t${fastqsize}" >> ${SLBIO_PROJECT_PATH}${reject_file}
                                   spec_pipeline=$(awk -v spec_id="^${j}$" 'BEGIN{FS=","} $1 ~ spec_id {print $10}' ${SLBIO_PROJECT_PATH}${final_sample_sheet_name})
-
-                                 sed -i "/${j},/{s/,${spec_pipeline},/,na,/g}" ${SLBIO_PROJECT_PATH}${final_sample_sheet_name}  
+                                   #on set pipeline na
+                                   sed -i "/${j},/{s/,${spec_pipeline},/,na,/g}" ${SLBIO_PROJECT_PATH}${final_sample_sheet_name}  
                                 fi
 			done
 	  fi

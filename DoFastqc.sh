@@ -18,11 +18,12 @@ for proj in "${projects_list[@]}"
 	sample_list=()
        
 	id_list_file_name=$(cat ${SLBIO_PROJECT_PATH}"CurrentIDlistFileName.txt")
- 
+	reject_file=${SLBIO_PROJECT_PATH}$(echo $(sed -n -E 's/reject_samples_filename: "(.+)"/\1/pg' ${PARAM_FILE})) 	
+
 	while read myspec
 	  do
 
-	  if [ ! -s ${SLBIO_FASTQC_BRUT_PATH}${spec}"_R1_fastqc.html" ]
+	  if ! grep -w -qs "${myspec}" ${reject_file}  &&  [ ! -s ${SLBIO_FASTQC_BRUT_PATH}${spec}"_R1_fastqc.html" ]
                   then
                   echo -e "Fastqc avant trimmomatic pour ${myspec} \t$(date "+%Y-%m-%d @ %H:%M$S")" >> $SLBIO_LOG_FILE
 		  all_fastq_prior_trimmo=$(echo "${SLBIO_FASTQ_BRUT_PATH}${myspec}"*".fastq.gz")
