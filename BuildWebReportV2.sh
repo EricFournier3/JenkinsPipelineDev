@@ -80,9 +80,16 @@ BuildSpecimen(){
 
         spec_inc=0
         nb_spec=${#proj_spec_arr[@]}
+        reject_file=${SLBIO_PROJECT_PATH}$(echo $(sed -n -E 's/reject_samples_filename: "(.+)"/\1/pg' ${PARAM_FILE}))
 
         for spec in ${proj_spec_arr[@]}
          do
+	 
+	 if  grep -w -qs "${spec}" ${reject_file}
+           then
+           spec="${spec} (annul&#233;)"
+         fi
+
          ((++spec_inc))
          if [ $spec_inc -ne $nb_spec ]
           then
